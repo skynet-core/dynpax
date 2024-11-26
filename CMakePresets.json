@@ -1,0 +1,140 @@
+{
+    "version": 10,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 29,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "linux-clang-debug",
+            "hidden": false,
+            "displayName": "Linux Clang Debug",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/install/${presetName}",
+            "cacheVariables": {
+                "CMAKE_CXX_STANDARD": "23",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_EXTENSIONS": "OFF",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_MAKE_PROGRAM": "/usr/bin/ninja",
+                "CMAKE_TOOLCHAIN_FILE": "$penv{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "CMAKE_C_FLAGS": "-O0",
+                "CMAKE_CXX_FLAGS": "-O0"
+            }
+        },
+        {
+            "name": "linux-clang-debug-leak",
+            "displayName": "Linux Clang Debug Leak",
+            "inherits": [
+                "linux-clang-debug"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=leak -O0",
+                "CMAKE_CXX_FLAGS": "-fsanitize=leak -O0"
+            }
+        },
+        {
+            "name": "linux-clang-debug-memory",
+            "displayName": "Linux Clang Debug Memory",
+            "inherits": [
+                "linux-clang-debug"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=memory -O0",
+                "CMAKE_CXX_FLAGS": "-fsanitize=memory -O0"
+            }
+        },
+        {
+            "name": "linux-clang-debug-thread",
+            "displayName": "Linux Clang Debug Thread",
+            "inherits": [
+                "linux-clang-debug"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=thread -O0",
+                "CMAKE_CXX_FLAGS": "-fsanitize=thread -O0"
+            }
+        },
+        {
+            "name": "linux-clang-debug-undef",
+            "displayName": "Linux Clang Debug Undefined",
+            "inherits": [
+                "linux-clang-debug"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=undefined -O0",
+                "CMAKE_CXX_FLAGS": "-fsanitize=undefined -O0"
+            }
+        },
+        {
+            "name": "linux-clang-debug-address",
+            "displayName": "Linux Clang Debug Address",
+            "inherits": [
+                "linux-clang-debug"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=address -O0",
+                "CMAKE_CXX_FLAGS": "-fsanitize=address -O0"
+            }
+        },
+        {
+            "name": "linux-clang-release",
+            "inherits": [
+                "linux-clang-debug"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_FLAGS": "-fuse-ld=lld -flto=thin -O3",
+                "CMAKE_CXX_FLAGS": "-fuse-ld=lld -flto=thin -O3"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "linux-clang-debug",
+            "displayName": "Linux Clang Debug",
+            "hidden": false,
+            "configurePreset": "linux-clang-debug"
+        },
+        {
+            "name": "linux-clang-debug-leak",
+            "displayName": "Linux Clang Debug Leak",
+            "hidden": false,
+            "configurePreset": "linux-clang-debug-leak"
+        },
+        {
+            "name": "linux-clang-debug-memory",
+            "displayName": "Linux Clang Debug Memory",
+            "hidden": false,
+            "configurePreset": "linux-clang-debug-memory"
+        },
+        {
+            "name": "linux-clang-debug-thread",
+            "displayName": "Linux Clang Debug Thread",
+            "hidden": false,
+            "configurePreset": "linux-clang-debug-thread"
+        },
+        {
+            "name": "linux-clang-debug-undef",
+            "displayName": "Linux Clang Debug Undefined",
+            "hidden": false,
+            "configurePreset": "linux-clang-debug-undef"
+        },
+        {
+            "name": "linux-clang-debug-address",
+            "displayName": "Linux Clang Debug Address",
+            "hidden": false,
+            "configurePreset": "linux-clang-debug-address"
+        },
+        {
+            "name": "linux-clang-release",
+            "displayName": "Linux Clang Release",
+            "hidden": false,
+            "configurePreset": "linux-clang-release"
+        }
+    ]
+}
