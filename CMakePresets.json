@@ -1,15 +1,14 @@
 {
-    "version": 10,
+    "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 29,
+        "minor": 28,
         "patch": 0
     },
     "configurePresets": [
         {
-            "name": "linux-clang-debug",
-            "hidden": false,
-            "displayName": "Linux Clang Debug",
+            "name": "linux-base",
+            "hidden": true,
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "installDir": "${sourceDir}/install/${presetName}",
@@ -17,79 +16,178 @@
                 "CMAKE_CXX_STANDARD": "23",
                 "CMAKE_CXX_STANDARD_REQUIRED": "ON",
                 "CMAKE_CXX_EXTENSIONS": "OFF",
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_COMPILER": "/usr/bin/clang",
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
                 "CMAKE_MAKE_PROGRAM": "/usr/bin/ninja",
-                "CMAKE_TOOLCHAIN_FILE": "$penv{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-                "CMAKE_C_FLAGS": "-O0",
-                "CMAKE_CXX_FLAGS": "-O0"
+                "CMAKE_TOOLCHAIN_FILE": "$penv{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+            }
+        },
+        {
+            "name": "linux-debug",
+            "hidden": true,
+            "inherits": [
+                "linux-base"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "linux-release",
+            "hidden": true,
+            "inherits": [
+                "linux-base"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "leak-san",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=leak",
+                "CMAKE_CXX_FLAGS": "-fsanitize=leak"
+            }
+        },
+        {
+            "name": "memory-san",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=memory",
+                "CMAKE_CXX_FLAGS": "-fsanitize=memory"
+            }
+        },
+        {
+            "name": "thread-san",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=thread",
+                "CMAKE_CXX_FLAGS": "-fsanitize=thread"
+            }
+        },
+        {
+            "name": "undef-san",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=undefined",
+                "CMAKE_CXX_FLAGS": "-fsanitize=undefined"
+            }
+        },
+        {
+            "name": "addr-san",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=address",
+                "CMAKE_CXX_FLAGS": "-fsanitize=address"
+            }
+        },
+        {
+            "name": "linux-clang",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+            }
+        },
+        {
+            "name": "linux-gcc14",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/bin/gcc-14",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++-14"
             }
         },
         {
             "name": "linux-clang-debug-leak",
             "displayName": "Linux Clang Debug Leak",
+            "hidden": false,
             "inherits": [
-                "linux-clang-debug"
-            ],
-            "cacheVariables": {
-                "CMAKE_C_FLAGS": "-fsanitize=leak -O0",
-                "CMAKE_CXX_FLAGS": "-fsanitize=leak -O0"
-            }
+                "linux-debug",
+                "linux-clang",
+                "leak-san"
+            ]
         },
         {
             "name": "linux-clang-debug-memory",
             "displayName": "Linux Clang Debug Memory",
+            "hidden": false,
             "inherits": [
-                "linux-clang-debug"
-            ],
-            "cacheVariables": {
-                "CMAKE_C_FLAGS": "-fsanitize=memory -O0",
-                "CMAKE_CXX_FLAGS": "-fsanitize=memory -O0"
-            }
+                "linux-debug",
+                "linux-clang",
+                "memory-san"
+            ]
         },
         {
             "name": "linux-clang-debug-thread",
+            "hidden": false,
             "displayName": "Linux Clang Debug Thread",
             "inherits": [
-                "linux-clang-debug"
-            ],
-            "cacheVariables": {
-                "CMAKE_C_FLAGS": "-fsanitize=thread -O0",
-                "CMAKE_CXX_FLAGS": "-fsanitize=thread -O0"
-            }
+                "linux-debug",
+                "linux-clang",
+                "thread-san"
+            ]
         },
         {
             "name": "linux-clang-debug-undef",
+            "hidden": false,
             "displayName": "Linux Clang Debug Undefined",
             "inherits": [
-                "linux-clang-debug"
-            ],
-            "cacheVariables": {
-                "CMAKE_C_FLAGS": "-fsanitize=undefined -O0",
-                "CMAKE_CXX_FLAGS": "-fsanitize=undefined -O0"
-            }
+                "linux-debug",
+                "linux-clang",
+                "undef-san"
+            ]
         },
         {
             "name": "linux-clang-debug-address",
+            "hidden": false,
             "displayName": "Linux Clang Debug Address",
             "inherits": [
-                "linux-clang-debug"
-            ],
-            "cacheVariables": {
-                "CMAKE_C_FLAGS": "-fsanitize=address -O0",
-                "CMAKE_CXX_FLAGS": "-fsanitize=address -O0"
-            }
+                "linux-debug",
+                "linux-clang",
+                "addr-san"
+            ]
+        },
+        {
+            "name": "linux-clang-debug",
+            "displayName": "Linux Clang Debug",
+            "hidden": false,
+            "inherits": [
+                "linux-debug",
+                "linux-clang"
+            ]
+        },
+        {
+            "name": "linux-gcc14-debug",
+            "displayName": "Linux GCC14 Debug",
+            "hidden": false,
+            "inherits": [
+                "linux-debug",
+                "linux-gcc14"
+            ]
         },
         {
             "name": "linux-clang-release",
+            "displayName": "Linux Clang Release",
+            "hidden": false,
             "inherits": [
-                "linux-clang-debug"
+                "linux-release",
+                "linux-clang"
             ],
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_C_FLAGS": "-fuse-ld=lld -flto=thin -O3",
-                "CMAKE_CXX_FLAGS": "-fuse-ld=lld -flto=thin -O3"
+                "CMAKE_C_FLAGS": "-fuse-ld=lld -flto=thin",
+                "CMAKE_CXX_FLAGS": "-fuse-ld=lld -flto=thin"
+            }
+        },
+        {
+            "name": "linux-gcc14-release",
+            "displayName": "Linux GCC14 Release",
+            "hidden": false,
+            "inherits": [
+                "linux-release",
+                "linux-gcc14"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
             }
         }
     ],
@@ -99,6 +197,24 @@
             "displayName": "Linux Clang Debug",
             "hidden": false,
             "configurePreset": "linux-clang-debug"
+        },
+        {
+            "name": "linux-gcc14-debug",
+            "displayName": "Linux GCC14 Debug",
+            "hidden": false,
+            "configurePreset": "linux-gcc14-debug"
+        },
+        {
+            "name": "linux-clang-release",
+            "displayName": "Linux Clang Release",
+            "hidden": false,
+            "configurePreset": "linux-clang-release"
+        },
+        {
+            "name": "linux-gcc14-release",
+            "displayName": "Linux GCC14 Release",
+            "hidden": false,
+            "configurePreset": "linux-gcc14-release"
         },
         {
             "name": "linux-clang-debug-leak",
@@ -129,12 +245,6 @@
             "displayName": "Linux Clang Debug Address",
             "hidden": false,
             "configurePreset": "linux-clang-debug-address"
-        },
-        {
-            "name": "linux-clang-release",
-            "displayName": "Linux Clang Release",
-            "hidden": false,
-            "configurePreset": "linux-clang-release"
         }
     ]
 }

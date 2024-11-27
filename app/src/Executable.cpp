@@ -13,7 +13,6 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -22,8 +21,9 @@ namespace dynpax
 
 struct Executable::Impl
 {
-    explicit Impl(std::string_view name)
-        : binary{LIEF::Parser::parse(std::string{name})}
+    explicit Impl(std::string name)
+        : binary{LIEF::Parser::parse(name)},
+          filePath_{std::move(name)}
     {
     }
 
@@ -117,13 +117,18 @@ struct Executable::Impl
             return false;
         }
     }
+    [[nodiscard]] auto filePath() const -> fs::path
+    {
+        return filePath_;
+    }
 
   private:
     decltype(LIEF::Parser::parse("")) binary{nullptr};
+    fs::path filePath_;
 };
 
-Executable::Executable(std::string_view name)
-    : pimpl{std::make_unique<Impl>(name)}
+Executable::Executable(std::string name)
+    : pimpl{std::make_unique<Impl>(std::move(name))}
 {
 }
 
@@ -189,6 +194,11 @@ void Executable::interpreter(const std::string &interpreter)
 void Executable::runpath(const std::vector<std::string> &runpath)
 {
     pimpl->runpath(runpath);
+}
+
+[[nodiscard]] auto Executable::filePath() const -> fs::path
+{
+    return pimpl->filePath();
 }
 
 void swap(Executable &lhs, Executable &rhs) noexcept

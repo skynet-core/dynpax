@@ -17,11 +17,9 @@ struct App
     {
         fs::path target;
         fs::path fakeRoot;
-#ifdef __linux__
         bool includeInterpreter;
-#endif
     };
-    using Result = std::expected<Params, std::runtime_error>;
+    using Result = std::expected<Params, int>;
 
     explicit App(std::string_view name);
 

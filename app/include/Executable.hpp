@@ -5,15 +5,15 @@
 #include <memory>
 #include <optional>
 #include <stdexcept>
-#include <string_view>
 #include <vector>
+#include <string>
 
 namespace dynpax
 {
 namespace fs = std::filesystem;
 struct Executable
 {
-    explicit Executable(std::string_view name);
+    explicit Executable(std::string name);
     Executable(const Executable &rhs) = delete;
     Executable(Executable &&rhs) noexcept;
     auto operator=(const Executable &rhs) -> Executable & = delete;
@@ -40,6 +40,8 @@ struct Executable
     auto write(const fs::path &destFile) -> bool;
 
     explicit operator bool() const;
+
+    [[nodiscard]] auto filePath() const -> fs::path;
 
   private:
     struct Impl;

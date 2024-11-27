@@ -1,6 +1,7 @@
 #include "App.hpp"
 #include <CLI/CLI.hpp>
 #include <exception>
+#include <expected>
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
@@ -25,10 +26,8 @@ struct App::Impl
             ->required();
         app.add_option("-f,--fake-root"s, params.fakeRoot,
                        "Fake root to be used as RUNPATH"s);
-#ifdef __linux__
         app.add_flag("-i,--interpreter"s, params.includeInterpreter,
                      "Add linker/interpreter to bundle"s);
-#endif
     }
 
     auto parse(int argc, char *argv[]) noexcept -> Result // NOLINT
@@ -50,9 +49,9 @@ struct App::Impl
             }
             return params;
         }
-        catch (const std::exception &e)
+        catch (const CLI::ParseError &e)
         {
-            return std::unexpected(std::runtime_error{e.what()});
+            return std::unexpected(app.exit(e));
         }
     }
 
