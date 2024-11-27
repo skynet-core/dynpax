@@ -5,8 +5,8 @@
 #include <memory>
 #include <optional>
 #include <stdexcept>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace dynpax
 {
@@ -26,10 +26,9 @@ struct Executable
         -> std::vector<std::string>;
 
     [[nodiscard]] auto interpreter() const
-        -> std::expected<std::optional<std::string>,
-                         std::runtime_error>;
+        -> std::expected<std::optional<fs::path>, std::runtime_error>;
 
-    void interpreter(const std::string &interpreter);
+    void interpreter(const fs::path &interpreter);
 
     [[nodiscard]] auto runpath() const
         -> std::expected<std::optional<std::vector<std::string>>,

@@ -1,0 +1,13 @@
+FROM smartcoder/dynpax AS tool
+
+FROM ubuntu:noble AS runtime
+
+COPY --from=tool /dynpax /dynpax
+
+RUN /dynpax/bin/dynpax -t /usr/bin/bash -f /opt/fakeroot -i
+
+FROM scratch AS destination
+
+COPY --from=runtime /opt/fakeroot /
+
+CMD ["/bin/bash","-i"]

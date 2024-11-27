@@ -7,3 +7,4 @@ compile_commands.json
 .clang-tidy
 .clangd
 Dockerfile
+README.md

@@ -3,16 +3,19 @@
 #include "LIEF/ELF/Binary.hpp"
 #include "LIEF/ELF/DynamicEntry.hpp"
 #include "LIEF/ELF/DynamicEntryRunPath.hpp"
+#include "LIEF/ELF/Segment.hpp"
 #include <LIEF/ELF.hpp>
 #include <LIEF/LIEF.hpp>
 #include <LIEF/Object.hpp>
 #include <algorithm>
 #include <expected>
 #include <filesystem>
+#include <fmt/printf.h>
 #include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -38,8 +41,7 @@ struct Executable::Impl
     }
 
     [[nodiscard]] auto interpreter() const
-        -> std::expected<std::optional<std::string>,
-                         std::runtime_error>
+        -> std::expected<std::optional<fs::path>, std::runtime_error>
     {
         if (LIEF::ELF::Binary::classof(binary.get()))
         {
@@ -47,7 +49,7 @@ struct Executable::Impl
             auto &elf = static_cast<LIEF::ELF::Binary &>(*binary);
             if (!elf.has_interpreter())
             {
-                return std::optional<std::string>{};
+                return std::optional<fs::path>{};
             }
             return elf.interpreter();
         }
@@ -79,13 +81,35 @@ struct Executable::Impl
         return std::unexpected{std::runtime_error{"not ELF binary"}};
     }
 
-    void interpreter(const std::string &name)
+    void interpreter(const fs::path &path)
     {
+        // TODO: this still does not work
         if (LIEF::ELF::Binary::classof(binary.get()))
         {
-            auto &elf =
-                static_cast<LIEF::ELF::Binary &>(*binary); // NOLINT
-            elf.interpreter(name);
+            // NOLINTNEXTLINE
+            auto &elf = static_cast<LIEF::ELF::Binary &>(*binary);
+            // for (auto &seg : elf.segments())
+            // {
+            //     if (seg.is_interpreter())
+            //     {
+            //         const auto &cnt =
+            //             path.lexically_normal().u8string();
+            //         // NOLINTNEXTLINE
+            //         const auto *uint8Data =
+            //             reinterpret_cast<const uint8_t *>( // NOLINT
+            //                 cnt.data());
+            //         // NOLINTNEXTLINE
+            //         seg.content(std::vector(
+            //             uint8Data,
+            //             uint8Data + cnt.size())); // NOLINT
+            //         fmt::println("Updated interpreter ...");
+            //         return;
+            //     }
+            // }
+
+            // fmt::println("Could not find interpreter segment");
+
+            elf.interpreter(path.lexically_normal());
         }
     }
 
@@ -107,9 +131,23 @@ struct Executable::Impl
             if (destFile.has_parent_path() &&
                 !fs::exists(destFile.parent_path()))
             {
-                fs::create_directories(destFile.parent_path());
+                std::error_code errc;
+                fs::create_directories(destFile.parent_path(), errc);
             }
             binary->write(destFile.string());
+            // if (LIEF::ELF::Binary::classof(binary.get()))
+            // {
+            //     // NOLINTNEXTLINE
+            //     auto &elf = static_cast<LIEF::ELF::Binary
+            //     &>(*binary); LIEF::ELF::Builder::config_t
+            //     builder_config{}; elf.write(destFile.string(),
+            //     builder_config);
+            // }
+            // else
+            // {
+            //     binary->write(destFile.string());
+            // }
+
             return true;
         }
         catch (...)
@@ -163,7 +201,7 @@ Executable::operator bool() const
 }
 
 [[nodiscard]] auto Executable::interpreter() const
-    -> std::expected<std::optional<std::string>, std::runtime_error>
+    -> std::expected<std::optional<fs::path>, std::runtime_error>
 {
     return pimpl->interpreter();
 }
@@ -186,7 +224,7 @@ auto Executable::write(const fs::path &destFile) -> bool
     return pimpl->write(destFile);
 }
 
-void Executable::interpreter(const std::string &interpreter)
+void Executable::interpreter(const fs::path &interpreter)
 {
     pimpl->interpreter(interpreter);
 }

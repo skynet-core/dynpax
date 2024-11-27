@@ -38,11 +38,11 @@ auto FileManager::joinFakeRoot(
 auto FileManager::copyFile(const fs::path &src, const fs::path &dst)
     -> bool
 {
+    std::error_code errc;
     if (!fs::exists(dst.parent_path()))
     {
-        fs::create_directories(dst.parent_path());
+        fs::create_directories(dst.parent_path(), errc);
     }
-    std::error_code errc;
     fs::copy_file(src, dst,
                   fs::copy_options::overwrite_existing |
                       fs::copy_options::copy_symlinks |

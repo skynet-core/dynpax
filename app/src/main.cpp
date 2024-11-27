@@ -3,11 +3,13 @@
 #include "FileManager.hpp"
 #include "LibraryResolver.hpp"
 #include <expected>
+#include <filesystem>
 #include <fmt/base.h>
 #include <fmt/printf.h>
 #include <fmt/ranges.h>
 #include <stdexcept>
-#include <string>
+
+namespace fs = std::filesystem;
 
 auto main(int argc, char *argv[]) -> int
 {
@@ -51,12 +53,11 @@ auto main(int argc, char *argv[]) -> int
                 binary.interpreter()
                     .and_then([](auto &&optInterpreter)
                                   -> std::expected<
-                                      std::string,
-                                      std::runtime_error> {
+                                      fs::path, std::runtime_error> {
                         return optInterpreter
                             .transform([](auto &&value)
                                            -> std::expected<
-                                               std::string,
+                                               fs::path,
                                                std::runtime_error> {
                                 return value;
                             })
@@ -68,20 +69,31 @@ auto main(int argc, char *argv[]) -> int
                     })
                     .and_then([&fileManager](const auto &src)
                                   -> std::expected<
-                                      bool, std::runtime_error> {
+                                      fs::path, std::runtime_error> {
                         const auto dst =
                             fileManager.joinFakeRoot({src});
-                        fmt::println("Copy {} => {}", src,
+                        fmt::println("Copy {} => {}", src.string(),
                                      dst.string());
                         return dynpax::FileManager::copyFile(src, dst)
                                    ? std::expected<
-                                         bool,
-                                         std::runtime_error>{true}
+                                         fs::path,
+                                         std::runtime_error>{dst}
                                    : std::unexpected(
                                          std::runtime_error{
                                              "failed to copy "
                                              "interpreter: "
                                              "filesystem error"});
+                    })
+                    .and_then([&binary]([[maybe_unused]] const auto
+                                            &newInterpreter)
+                                  -> std::expected<
+                                      void, std::runtime_error> {
+                        // TODO: still does not work ...
+                        // fmt::println("Patch interpreter to {}",
+                        //              newInterpreter.string());
+                        // binary.interpreter(newInterpreter);
+                        return std::expected<void,
+                                             std::runtime_error>{};
                     });
             !interpreterResult)
         {
