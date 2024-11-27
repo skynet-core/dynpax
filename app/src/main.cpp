@@ -91,10 +91,11 @@ auto main(int argc, char *argv[]) -> int
         }
     }
 
-    const auto binDst =
-        fileManager.joinFakeRoot({"bin", binary.filePath()});
-    fmt::println("Copy binary {} => {}", binary.filePath().string(),
-                 binDst.string());
+    const auto binDst = fileManager.joinFakeRoot(
+        {"bin", binary.filePath().filename()});
+    fmt::println("Copy binary {} => {} {}",
+                 binary.filePath().string(), binDst.string(),
+                 binary.filePath().filename().string());
     if (!dynpax::FileManager::copyFile(binary.filePath(), binDst))
     {
         fmt::println("Error: failed to copy binary to new root");

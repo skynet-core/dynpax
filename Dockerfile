@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt full-upgrade -y && \
     apt install -y gcc-14 g++-14 git curl zip unzip tar wget \
-    cmake ninja-build pkgconf make automake autoconf autoconf-archive
+    cmake ninja-build pkgconf make automake autoconf autoconf-archive tree
 
 ENV CC=/usr/bin/gcc-14
 ENV CXX=/usr/bin/g++-14
@@ -22,8 +22,11 @@ RUN cd /tmp/dynpax && cmake --preset linux-gcc14-release --fresh && \
     cmake --build --preset linux-gcc14-release --target dynpax && \
     cmake --install ./build/linux-gcc14-release --prefix /opt/dynpax
 
+# let dynpax to repack itself to have clean bundle ...
+RUN /opt/dynpax/bin/dynpax -t /opt/dynpax/bin/dynpax -f /opt/bundle -i
+
 FROM scratch AS runtime
 
-COPY --from=builder /opt/dynpax /
+COPY --from=builder /opt/bundle /
 
 CMD ["/bin/dynpax"]

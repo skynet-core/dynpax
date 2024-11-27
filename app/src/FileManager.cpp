@@ -1,7 +1,9 @@
 #include "FileManager.hpp"
 #include <filesystem>
+#include <fmt/printf.h>
 #include <initializer_list>
 #include <numeric>
+#include <system_error>
 #include <utility>
 
 namespace dynpax
@@ -24,11 +26,13 @@ auto FileManager::fakeRoot() const -> fs::path
 auto FileManager::joinFakeRoot(
     std::initializer_list<fs::path> paths) const -> fs::path
 {
-    return std::accumulate(paths.begin(), paths.end(), m_fakeRoot,
-                           [](const auto &left, const auto &right) {
-                               return left /
-                                      right.lexically_relative("/");
-                           });
+    return std::accumulate(
+        paths.begin(), paths.end(), m_fakeRoot,
+        [](const auto &left, const auto &right) {
+            return left / (right.is_absolute()
+                               ? right.lexically_relative("/")
+                               : right);
+        });
 }
 
 auto FileManager::copyFile(const fs::path &src, const fs::path &dst)
@@ -38,9 +42,12 @@ auto FileManager::copyFile(const fs::path &src, const fs::path &dst)
     {
         fs::create_directories(dst.parent_path());
     }
-    return fs::copy_file(src, dst,
-                         fs::copy_options::overwrite_existing |
-                             fs::copy_options::copy_symlinks |
-                             fs::copy_options::recursive);
+    std::error_code errc;
+    fs::copy_file(src, dst,
+                  fs::copy_options::overwrite_existing |
+                      fs::copy_options::copy_symlinks |
+                      fs::copy_options::recursive,
+                  errc);
+    return !errc;
 }
 } // namespace dynpax
