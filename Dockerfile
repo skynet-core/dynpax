@@ -34,4 +34,3 @@ RUN patchelf --set-interpreter /dynpax/lib64/ld-linux-x86-64.so.2 /opt/bundle/bi
 FROM scratch AS runtime
 
 COPY --from=builder /opt/bundle /dynpax
-
