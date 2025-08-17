@@ -1,38 +1,37 @@
 cmake_minimum_required(VERSION 3.28)
 
 project(
-  dynpax
-  VERSION 0.1.0
-  LANGUAGES CXX)
+        dynpax
+        VERSION 0.1.0
+        LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-literal-operator")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
-include(LIEF)
+include(Dependencies)
 include(GNUInstallDirs)
 include(BundleUtils)
 
-find_package(CLI11 CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
+add_executable(dynpax
+        src/bin/dynpax.cpp
+        src/lib/App.cpp
+        src/lib/Executable.cpp
+        src/lib/FileManager.cpp
+        src/lib/linux/LinuxLibraryResolver.cpp
+)
 
-file(GLOB SOURCES "app/src/*.cpp")
-
-if(LINUX)
-  file(GLOB LINUX_SOURCES "app/src/linux/*.cpp")
-  list(APPEND SOURCES ${LINUX_SOURCES})
-endif()
-
-add_executable(dynpax)
-
-target_sources(dynpax PRIVATE ${SOURCES})
-
-target_include_directories(dynpax PRIVATE "app/include")
+target_include_directories(dynpax PRIVATE "src/include")
 
 target_link_libraries(dynpax PRIVATE CLI11::CLI11 LIEF::LIEF
-                                     fmt::fmt-header-only)
+        fmt::fmt-header-only)
 install(
-  TARGETS dynpax
-  RUNTIME COMPONENT dynpax DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY COMPONENT dynpax DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE COMPONENT dynpax DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        TARGETS dynpax
+        RUNTIME COMPONENT dynpax DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY COMPONENT dynpax DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE COMPONENT dynpax DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-  fixup_target_bundle(dynpax)
+fixup_target_bundle(dynpax)
